@@ -223,6 +223,14 @@ If no session exists, or it has expired, login first."
                                  issue-key comment-id)))
 
 
+(defun jiralib2-add-attachment (issue-key name body)
+  "Add attachment to issue ISSUE-KEY titled NAME with contents BODY."
+  (jiralib2-session-call (format "/rest/api/2/issue/%s/attachments" issue-key)
+                         :type "POST"
+                         :headers '(("X-Atlassian-Token" . "nocheck"))
+                         :files `(("file" . (,name :data ,body)))))
+
+
 (defun jiralib2--get-users (project-key)
   "Download assignable users information given the PROJECT-KEY."
   (let ((offset 0)
