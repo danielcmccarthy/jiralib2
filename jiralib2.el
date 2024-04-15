@@ -157,14 +157,20 @@
 (defun jiralib2--session-call (path args)
   "Do a call to PATH with ARGS using current session.
 Does not check for session validity."
-  (let ((json-array-type jiralib2-json-array-type))
+  (let ((json-array-type jiralib2-json-array-type)
+        (headers (plist-get args :headers)))
+    ;; If :files is present, request will generate Content-Type for
+    ;; us.
+    (unless (or (plist-get args :files)
+                (assoc "Content-Type" headers))
+      (push '("Content-Type" . "application/json") headers))
     (apply #'request (concat jiralib2-url path)
-           :headers `(("Content-Type" . "application/json")
-                      ,(cond ((eq jiralib2-auth 'cookie)
+           :headers `(,(cond ((eq jiralib2-auth 'cookie)
                               `("cookie" . ,jiralib2--session))
                              ((member jiralib2-auth '(basic token))
                               `("Authorization" . ,(format "Basic %s"
-                                                           jiralib2--session)))))
+                                                           jiralib2--session))))
+                      ,@headers)
            :sync t
            :parser 'json-read
            args)))
