@@ -230,6 +230,12 @@ If no session exists, or it has expired, login first."
                          :headers '(("X-Atlassian-Token" . "nocheck"))
                          :files `(("file" . (,name :data ,body)))))
 
+(defun jiralib2-delete-attachment (attachment-id)
+  "Remove attachment ATTACHMENT-ID."
+  (jiralib2-session-call (format "/rest/api/2/attachment/%s"
+                                 attachment-id)
+                         :type "DELETE"))
+
 
 (defun jiralib2--get-users (project-key)
   "Download assignable users information given the PROJECT-KEY."
